@@ -8,7 +8,7 @@
 
 ListingReady 是一个跨境商品本地化上新助手。它把中文商品资料转换成可检查的 Amazon 美国站 Listing，帮助卖家在发布前发现参数缺失、事实不一致和潜在合规风险。
 
-当前演示商品为折叠式铝合金手机支架。
+当前演示商品为可堆叠抽屉式桌面收纳盒。
 
 ### 功能
 
@@ -20,7 +20,7 @@ ListingReady 是一个跨境商品本地化上新助手。它把中文商品资�
 
 ### 当前状态
 
-当前版本使用固定 Mock 数据，不需要 API Key，适合初赛演示和方案验证。获得赛事提供的阿里云百炼 API Key/Credits 后，再接入真实模型生成能力。
+当前版本使用只读、未验证的固定 Mock 数据，不需要 API Key，仅适合初赛演示和方案验证，不能直接作为商品发布资料。获得赛事提供的阿里云百炼 API Key/Credits 后，再接入真实模型生成能力。
 
 ### 本地运行
 
@@ -49,7 +49,7 @@ ListingReady 聚焦“翻译之后、发布之前”的关键环节：先整理�
 
 ListingReady is an AI-assisted product localization tool for cross-border sellers. It turns Chinese product information into a reviewable Amazon US listing and flags missing specifications, factual inconsistencies, and potential compliance risks before publication.
 
-The current demo uses a foldable aluminum phone stand as the sample product.
+The current demo uses a stackable desktop drawer organizer as the sample product.
 
 ### Features
 
@@ -61,7 +61,7 @@ The current demo uses a foldable aluminum phone stand as the sample product.
 
 ### Current Status
 
-The current version uses fixed mock data and requires no API key. It is intended for the preliminary competition demo and concept validation. Alibaba Cloud Model Studio/Bailian integration will be added after the competition API key or credits are granted.
+The current version uses read-only, unverified mock data and requires no API key. It must not be used as publish-ready product information. It is intended for the preliminary competition demo and concept validation. Alibaba Cloud Model Studio/Bailian integration will be added after the competition API key or credits are granted.
 
 ### Run Locally
 

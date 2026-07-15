@@ -1,4 +1,4 @@
-﻿import assert from "node:assert/strict";
+import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 
@@ -16,7 +16,7 @@ async function render() {
   );
 }
 
-test("renders the ListingReady demo", async () => {
+test("renders the ListingReady organizer demo", async () => {
   const response = await render();
   assert.equal(response.status, 200);
 
@@ -25,8 +25,13 @@ test("renders the ListingReady demo", async () => {
   assert.match(html, /小宋1021队/);
   assert.match(html, /AI智能上新/);
   assert.match(html, /Amazon 美国站/);
+  assert.match(html, /可堆叠抽屉式桌面收纳盒/);
+  assert.match(html, /Stackable Desk Organizer/);
+  assert.match(html, /未验证 Mock/);
+  assert.match(html, /抽屉内部尺寸/);
   assert.match(html, /生成上新包/);
   assert.match(html, /演示模式/);
+  assert.doesNotMatch(html, /手机支架|phone stand|tablet holder|4-12\.9/i);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/);
 });
 
@@ -47,4 +52,3 @@ test("removes the disposable starter", async () => {
   await assert.rejects(access(new URL("../app/_sites-preview", import.meta.url)));
   await access(new URL("public/favicon.svg", root));
 });
-

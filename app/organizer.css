@@ -1,0 +1,54 @@
+.organizer {
+  position: absolute;
+  z-index: 2;
+  width: 250px;
+  left: 50%;
+  top: 82px;
+  transform: translateX(-50%) rotate(-2deg);
+}
+
+.organizer-unit {
+  position: relative;
+  height: 128px;
+  border: 2px solid rgba(57, 84, 73, .22);
+  border-radius: 22px;
+  background: linear-gradient(145deg, #ffffff, #e8eee9);
+  box-shadow: 0 20px 30px rgba(17, 54, 40, .16);
+}
+
+.organizer-top {
+  width: 220px;
+  margin: 0 0 10px 26px;
+}
+
+.organizer-drawer {
+  position: absolute;
+  inset: 14px;
+  border: 1px solid rgba(73, 98, 87, .22);
+  border-radius: 15px;
+  background: linear-gradient(180deg, #fbfcfb, #dce5df);
+  box-shadow: inset 0 5px 12px rgba(53, 79, 68, .07);
+}
+
+.organizer-drawer::after {
+  content: "";
+  position: absolute;
+  width: 54px;
+  height: 10px;
+  left: 50%;
+  top: 14px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: #9eb4a8;
+}
+
+.upload-card {
+  cursor: default;
+}
+
+.field-grid input:read-only,
+.field-grid textarea:read-only {
+  background: #f4f6f3;
+  color: #526158;
+}
+
