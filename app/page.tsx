@@ -6,28 +6,28 @@ import "./organizer.css";
 
 const listing = {
   title:
-    "Stackable Desk Organizer with 2 Drawers, Desktop Storage Box for Office Supplies and Small Items",
+    "Slim Desk Drawer Organizer, Pull-Out Storage Box for Pens, Cards and Small Office Supplies",
   bullets: [
-    "Two pull-out drawers: separates stationery, cables, cosmetics, and other small items.",
-    "Stackable design: place multiple organizer units vertically to use desk space efficiently.",
-    "Compact footprint: keeps everyday small items organized without taking over the work surface.",
-    "Simple drawer storage: keeps frequently used supplies separated and within reach.",
-    "Flexible organization: suitable for office supplies, craft tools, makeup, and accessories.",
+    "Flexible placement: real photos show individual drawer units placed side by side and arranged vertically.",
+    "Pull-out access: the semicircle front cutout provides a simple grip for opening each drawer.",
+    "Small-item organization: photographed holding pens, markers, cards, wallets, and other desk essentials.",
+    "Slim white profile: photographed beneath a desk shelf and in a vertical arrangement.",
+    "Verify before publishing: material, dimensions, pack quantity, weight, and load capacity still require confirmation.",
   ],
   description:
-    "A compact two-drawer organizer designed to keep everyday small items visible and separated. Its stackable shape helps use vertical space on an office desk, shelf, or vanity while keeping frequently used supplies within reach.",
+    "A slim drawer organizer shown in real use with stationery, cards, wallets, and small desk items. The real photos show individual white drawer units placed side by side beneath a shelf and arranged vertically. This draft intentionally omits material, dimensions, pack quantity, weight, load, and locking-stack claims until the seller confirms them.",
   searchTerms:
-    "stackable desk organizer drawer storage box office supplies desktop organization plastic drawers",
+    "slim desk drawer organizer pull out storage box stationery cards office supplies",
   checks: [
     { label: "标题长度", detail: "不超过 200 字符，符合演示规则", tone: "pass" },
-    { label: "事实一致性", detail: "抽屉数量、材质和尺寸为未验证 Mock，禁止直接发布", tone: "warn" },
+    { label: "照片证据", detail: "白色、单格抽屉、横排与垂直叠放场景均来自真实照片", tone: "pass" },
     { label: "夸张宣传", detail: "未使用 best、No.1、100% 等无依据词语", tone: "pass" },
-    { label: "待人工确认", detail: "抽屉内部尺寸和最大承重尚未提供，文案中未生成相关承诺", tone: "warn" },
+    { label: "参数待确认", detail: "材质、尺寸、套装数量、重量、承重与锁定式堆叠结构尚待确认", tone: "warn" },
   ],
 };
 
 const copyText = [
-  "[UNVERIFIED MOCK — DO NOT PUBLISH]",
+  "[DRAFT FROM REAL PHOTOS — VERIFY PARAMETERS BEFORE PUBLISH]",
   "",
   listing.title,
   "",
@@ -40,12 +40,12 @@ const copyText = [
 
 export default function Home() {
   const [generated, setGenerated] = useState(false);
-  const [notice, setNotice] = useState("演示模式 · 暂未接入百炼 API");
+  const [notice, setNotice] = useState("3 张真实照片已接入 · 暂未接入百炼 API");
 
   function generate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setGenerated(true);
-    setNotice("演示上新包已生成 · 数据来源：固定 Mock");
+    setNotice("照片证据草稿已生成 · 参数待确认");
   }
 
   async function copyListing() {
@@ -59,7 +59,7 @@ export default function Home() {
 
   function downloadListing() {
     const file = new Blob(
-      [JSON.stringify({ source: "mock", verified: false, warning: "UNVERIFIED MOCK — DO NOT PUBLISH", marketplace: "Amazon US", listing }, null, 2)],
+      [JSON.stringify({ source: "user_photos", verified: false, warning: "DRAFT FROM REAL PHOTOS — VERIFY PARAMETERS BEFORE PUBLISH", marketplace: "Amazon US", photoEvidence: ["scene-horizontal.jpg", "scene-stacked.jpg", "scene-drawers-open.jpg"], listing }, null, 2)],
       { type: "application/json" },
     );
     const url = URL.createObjectURL(file);
@@ -95,13 +95,14 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="product-stage" role="img" aria-label="可堆叠抽屉式桌面收纳盒演示图形">
-          <span className="demo-label">DEMO SKU · 桌面收纳盒</span>
-          <div className="organizer">
-            <div className="organizer-unit organizer-top"><div className="organizer-drawer" /></div>
-            <div className="organizer-unit"><div className="organizer-drawer" /></div>
+        <div className="product-stage" aria-label="真实商品照片">
+          <span className="demo-label">REAL PHOTOS · 桌面收纳盒</span>
+          <div className="product-photo-grid">
+            <img className="product-photo product-photo-main" src="/product/scene-horizontal.jpg" alt="四个白色抽屉盒横向排列的真实场景" />
+            <img className="product-photo product-photo-stacked" src="/product/scene-stacked.jpg" alt="三个白色抽屉盒垂直叠放的真实场景" />
+            <div className="product-photo-frame"><img className="product-photo-rotated" src="/product/scene-drawers-open.jpg" alt="抽屉打开后收纳文具和卡片的真实场景" /></div>
           </div>
-          <div className="stage-note">Stackable · 2 Drawers · PP Plastic</div>
+          <div className="stage-note">REAL PHOTO EVIDENCE · 3 IMAGES</div>
         </div>
       </section>
 
@@ -116,27 +117,27 @@ export default function Home() {
           </div>
 
           <div className="upload-card">
-            <span className="upload-icon" aria-hidden="true">+</span>
-            <span><strong>商品图片待补充</strong><small>当前使用右侧 Mock 图，拿到实拍图后替换</small></span>
+            <span className="upload-icon" aria-hidden="true">✓</span>
+            <span><strong>3 张真实照片已接入</strong><small>已识别横排、垂直叠放和抽屉内使用场景</small></span>
           </div>
 
           <div className="field-grid">
-            <label>商品名称<input name="productName" defaultValue="可堆叠抽屉式桌面收纳盒" required readOnly /></label>
-            <label>材质<input name="material" defaultValue="PP 塑料（Mock，待实物确认）" required readOnly /></label>
-            <label>尺寸<input name="dimensions" defaultValue="24 × 17 × 14 cm（Mock，待实物测量）" required readOnly /></label>
-            <label>颜色<input name="color" defaultValue="白色" required readOnly /></label>
-            <label className="wide">结构规格<input name="structure" defaultValue="2 个抽屉；支持垂直堆叠" required readOnly /></label>
-            <label className="wide">核心卖点<textarea name="features" defaultValue="抽屉分类收纳；可堆叠节省桌面空间；表面易清洁；适合文具和小物" required readOnly /></label>
+            <label>商品名称<input name="productName" defaultValue="窄型抽屉收纳盒（照片展示横排与叠放）" required readOnly /></label>
+            <label>材质<input name="material" defaultValue="待确认（照片无法判断）" required readOnly /></label>
+            <label>尺寸<input name="dimensions" defaultValue="待测量" required readOnly /></label>
+            <label>颜色<input name="color" defaultValue="白色（照片可见）" required readOnly /></label>
+            <label className="wide">结构规格<input name="structure" defaultValue="独立单格抽屉；照片展示横排与垂直叠放，锁定结构待确认" required readOnly /></label>
+            <label className="wide">核心卖点<textarea name="features" defaultValue="半圆拉手；照片展示横排/叠放；适合文具、卡片、钱包和小物" required readOnly /></label>
           </div>
 
           <button className="primary-button" type="submit">
             {generated ? "重新生成演示上新包" : "生成上新包"}
             <span aria-hidden="true">→</span>
           </button>
-          <p className="form-note">当前字段为未验证 Mock 且只读，仅用于流程演示，禁止直接发布。</p>
+          <p className="form-note">真实照片已接入；当前仍是参数待确认草稿，禁止直接发布。</p>
         </form>
 
-        <section className="panel output-panel" aria-live="polite">
+        <section className="panel output-panel">
           <div className="panel-heading">
             <div>
               <span className="step">02</span>
@@ -151,7 +152,7 @@ export default function Home() {
             {!generated && <div className="result-lock">填写左侧信息并点击“生成上新包”</div>}
             <div className="result-content" aria-hidden={!generated}>
               <article className="result-block">
-                <span className="result-label">Amazon Title · 未验证 Mock</span>
+                <span className="result-label">Amazon Title · 真实照片草稿</span>
                 <h3>{listing.title}</h3>
               </article>
 
@@ -168,7 +169,7 @@ export default function Home() {
               <article className="quality-block">
                 <div className="quality-heading">
                   <span className="result-label">发布前质检</span>
-                  <strong>2 项通过 · 2 项待确认</strong>
+                  <strong>3 项通过 · 1 项待确认</strong>
                 </div>
                 <ul>
                   {listing.checks.map((check) => (
@@ -186,7 +187,7 @@ export default function Home() {
             <button type="button" className="secondary-button" onClick={copyListing} disabled={!generated}>复制全部文案</button>
             <button type="button" className="secondary-button" onClick={downloadListing} disabled={!generated}>下载 JSON</button>
           </div>
-          <p className="notice">{notice}</p>
+          <p className="notice" aria-live="polite">{notice}</p>
         </section>
       </section>
 

@@ -16,26 +16,28 @@ async function render() {
   );
 }
 
-test("renders the ListingReady organizer demo", async () => {
+test("renders the ListingReady organizer demo with real photos", async () => {
   const response = await render();
   assert.equal(response.status, 200);
 
   const html = await response.text();
   assert.match(html, /<title>ListingReady/);
   assert.match(html, /小宋1021队/);
-  assert.match(html, /AI智能上新/);
   assert.match(html, /Amazon 美国站/);
-  assert.match(html, /可堆叠抽屉式桌面收纳盒/);
-  assert.match(html, /Stackable Desk Organizer/);
-  assert.match(html, /未验证 Mock/);
-  assert.match(html, /抽屉内部尺寸/);
+  assert.match(html, /窄型抽屉收纳盒/);
+  assert.match(html, /Slim Desk Drawer Organizer/);
+  assert.match(html, /\/product\/scene-horizontal\.jpg/);
+  assert.match(html, /\/product\/scene-stacked\.jpg/);
+  assert.match(html, /\/product\/scene-drawers-open\.jpg/);
+  assert.match(html, /真实照片[\s\S]*草稿[\s\S]*禁止直接发布/);
+  assert.match(html, /参数待确认/);
   assert.match(html, /生成上新包/);
-  assert.match(html, /演示模式/);
   assert.doesNotMatch(html, /手机支架|phone stand|tablet holder|4-12\.9/i);
+  assert.doesNotMatch(html, /\bmock\b|\bplastic\b|PP 塑料|2 Drawers|Two pull-out drawers|two-drawer|2 个抽屉|24 × 17 × 14|演示图形|class="organizer"|\bmodular\b|\bstackable\b/i);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/);
 });
 
-test("removes the disposable starter", async () => {
+test("keeps required project and photo assets", async () => {
   const [page, layout, packageJson] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
@@ -50,5 +52,10 @@ test("removes the disposable starter", async () => {
   assert.doesNotMatch(layout, /Starter Project/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
   await assert.rejects(access(new URL("../app/_sites-preview", import.meta.url)));
-  await access(new URL("public/favicon.svg", root));
+  await Promise.all([
+    access(new URL("public/favicon.svg", root)),
+    access(new URL("public/product/scene-horizontal.jpg", root)),
+    access(new URL("public/product/scene-stacked.jpg", root)),
+    access(new URL("public/product/scene-drawers-open.jpg", root)),
+  ]);
 });

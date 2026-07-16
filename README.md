@@ -20,7 +20,7 @@ ListingReady 是一个跨境商品本地化上新助手。它把中文商品资�
 
 ### 当前状态
 
-当前版本使用只读、未验证的固定 Mock 数据，不需要 API Key，仅适合初赛演示和方案验证，不能直接作为商品发布资料。获得赛事提供的阿里云百炼 API Key/Credits 后，再接入真实模型生成能力。
+当前版本已接入 3 张真实商品照片，不需要 API Key。照片可证明颜色、抽屉结构、横排/垂直叠放场景和实际用途；材质、尺寸、套装数量、重量、承重及是否具备锁定式堆叠结构仍待确认，因此输出仍是禁止直接发布的草稿。获得赛事提供的阿里云百炼 API Key/Credits 后，再接入真实模型生成能力。
 
 ### 本地运行
 
@@ -61,7 +61,7 @@ The current demo uses a stackable desktop drawer organizer as the sample product
 
 ### Current Status
 
-The current version uses read-only, unverified mock data and requires no API key. It must not be used as publish-ready product information. It is intended for the preliminary competition demo and concept validation. Alibaba Cloud Model Studio/Bailian integration will be added after the competition API key or credits are granted.
+The current version uses three real product photos and requires no API key. The photos support the color, drawer structure, horizontal/vertical placement, and use cases; material, dimensions, pack quantity, weight, load capacity, and any locking stack mechanism still require confirmation, so the output remains a non-publishable draft. It is intended for the preliminary competition demo and concept validation. Alibaba Cloud Model Studio/Bailian integration will be added after the competition API key or credits are granted.
 
 ### Run Locally
 
