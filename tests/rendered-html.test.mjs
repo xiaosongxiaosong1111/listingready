@@ -26,10 +26,12 @@ test("renders the ListingReady organizer demo with real photos", async () => {
   assert.match(html, /Amazon 美国站/);
   assert.match(html, /窄型抽屉收纳盒/);
   assert.match(html, /Slim Desk Drawer Organizer/);
-  assert.match(html, /\/product\/scene-horizontal\.jpg/);
-  assert.match(html, /\/product\/scene-stacked\.jpg/);
-  assert.match(html, /\/product\/scene-drawers-open\.jpg/);
-  assert.match(html, /真实照片[\s\S]*草稿[\s\S]*禁止直接发布/);
+  assert.match(html, /\/product\/scene-horizontal\.png/);
+  assert.match(html, /\/product\/scene-stacked\.png/);
+  assert.match(html, /\/product\/scene-drawers-open\.png/);
+  assert.match(html, /实拍来源|源自实物照片/);
+  assert.match(html, /AI 净化/);
+  assert.match(html, /草稿[\s\S]*禁止直接发布/);
   assert.match(html, /参数待确认/);
   assert.match(html, /生成上新包/);
   assert.doesNotMatch(html, /手机支架|phone stand|tablet holder|4-12\.9/i);
@@ -54,8 +56,8 @@ test("keeps required project and photo assets", async () => {
   await assert.rejects(access(new URL("../app/_sites-preview", import.meta.url)));
   await Promise.all([
     access(new URL("public/favicon.svg", root)),
-    access(new URL("public/product/scene-horizontal.jpg", root)),
-    access(new URL("public/product/scene-stacked.jpg", root)),
-    access(new URL("public/product/scene-drawers-open.jpg", root)),
+    access(new URL("public/product/scene-horizontal.png", root)),
+    access(new URL("public/product/scene-stacked.png", root)),
+    access(new URL("public/product/scene-drawers-open.png", root)),
   ]);
 });
