@@ -41,14 +41,8 @@
   position: relative;
 }
 
-.product-photo-rotated {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  left: 0;
-  top: 0;
-  transform: rotate(90deg) scale(1.32);
-  object-fit: cover;
+.product-photo-open {
+  object-position: 50% 50%;
 }
 
 .upload-card {

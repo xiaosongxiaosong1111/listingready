@@ -16,10 +16,10 @@ ListingReady 把中文商品资料和真实照片整理成可检查的 Amazon �
 ## 2. 已经完成
 
 - 可运行的 Vinext/React 前端页面。
-- 已接入 3 张用户拍摄的真实商品照片：
-  - `public/product/scene-horizontal.jpg`
-  - `public/product/scene-stacked.jpg`
-  - `public/product/scene-drawers-open.jpg`
+- 已接入 3 张由用户实物照片 AI 净化生成的商品图；家庭环境、标签和第三方物品已移除，页面明确披露其为 AI 净化图：
+  - `public/product/scene-horizontal.png`
+  - `public/product/scene-stacked.png`
+  - `public/product/scene-drawers-open.png`
 - 页面展示英文 Listing 草稿、质量检查结果和参数待确认提醒。
 - 支持复制 Listing 和下载 JSON 上新包。
 - README 已提供中英文说明和本地运行命令。

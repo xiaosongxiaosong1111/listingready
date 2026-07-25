@@ -40,7 +40,7 @@ const copyText = [
 
 export default function Home() {
   const [generated, setGenerated] = useState(false);
-  const [notice, setNotice] = useState("3 张真实照片已接入 · 暂未接入百炼 API");
+  const [notice, setNotice] = useState("3 张实拍来源的 AI 净化图已接入 · 暂未接入百炼 API");
 
   function generate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -59,7 +59,7 @@ export default function Home() {
 
   function downloadListing() {
     const file = new Blob(
-      [JSON.stringify({ source: "user_photos", verified: false, warning: "DRAFT FROM REAL PHOTOS — VERIFY PARAMETERS BEFORE PUBLISH", marketplace: "Amazon US", photoEvidence: ["scene-horizontal.jpg", "scene-stacked.jpg", "scene-drawers-open.jpg"], listing }, null, 2)],
+      [JSON.stringify({ source: "ai_cleaned_user_photos", verified: false, warning: "DRAFT FROM REAL PHOTOS — VERIFY PARAMETERS BEFORE PUBLISH", marketplace: "Amazon US", photoEvidence: ["scene-horizontal.png", "scene-stacked.png", "scene-drawers-open.png"], listing }, null, 2)],
       { type: "application/json" },
     );
     const url = URL.createObjectURL(file);
@@ -96,13 +96,13 @@ export default function Home() {
         </div>
 
         <div className="product-stage" aria-label="真实商品照片">
-          <span className="demo-label">REAL PHOTOS · 桌面收纳盒</span>
+          <span className="demo-label">AI CLEANED · 源自实物照片</span>
           <div className="product-photo-grid">
-            <img className="product-photo product-photo-main" src="/product/scene-horizontal.jpg" alt="四个白色抽屉盒横向排列的真实场景" />
-            <img className="product-photo product-photo-stacked" src="/product/scene-stacked.jpg" alt="三个白色抽屉盒垂直叠放的真实场景" />
-            <div className="product-photo-frame"><img className="product-photo-rotated" src="/product/scene-drawers-open.jpg" alt="抽屉打开后收纳文具和卡片的真实场景" /></div>
+            <img className="product-photo product-photo-main" src="/product/scene-horizontal.png" alt="由实拍图净化生成的四个白色抽屉盒横向排列商品图" />
+            <img className="product-photo product-photo-stacked" src="/product/scene-stacked.png" alt="由实拍图净化生成的三个白色抽屉盒垂直叠放商品图" />
+            <div className="product-photo-frame"><img className="product-photo product-photo-open" src="/product/scene-drawers-open.png" alt="由实拍图净化生成的抽屉打开收纳文具场景图" /></div>
           </div>
-          <div className="stage-note">REAL PHOTO EVIDENCE · 3 IMAGES</div>
+          <div className="stage-note">REAL-PHOTO SOURCE · AI-CLEANED · 3 IMAGES</div>
         </div>
       </section>
 
@@ -118,7 +118,7 @@ export default function Home() {
 
           <div className="upload-card">
             <span className="upload-icon" aria-hidden="true">✓</span>
-            <span><strong>3 张真实照片已接入</strong><small>已识别横排、垂直叠放和抽屉内使用场景</small></span>
+            <span><strong>3 张 AI 净化商品图已接入</strong><small>均以真实商品照片为来源，已移除家庭环境、标签与第三方物品</small></span>
           </div>
 
           <div className="field-grid">
@@ -134,7 +134,7 @@ export default function Home() {
             {generated ? "重新生成演示上新包" : "生成上新包"}
             <span aria-hidden="true">→</span>
           </button>
-          <p className="form-note">真实照片已接入；当前仍是参数待确认草稿，禁止直接发布。</p>
+          <p className="form-note">图片由实拍素材 AI 净化；当前仍是参数待确认草稿，禁止直接发布。</p>
         </form>
 
         <section className="panel output-panel">
@@ -152,7 +152,7 @@ export default function Home() {
             {!generated && <div className="result-lock">填写左侧信息并点击“生成上新包”</div>}
             <div className="result-content" aria-hidden={!generated}>
               <article className="result-block">
-                <span className="result-label">Amazon Title · 真实照片草稿</span>
+                <span className="result-label">Amazon Title · 实拍来源草稿</span>
                 <h3>{listing.title}</h3>
               </article>
 
