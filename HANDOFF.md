@@ -4,8 +4,8 @@
 参赛队伍：小宋1021队（个人参赛）  
 赛道：AI 智能上新  
 GitHub（私有仓库）：https://github.com/xiaosongxiaosong1111/listingready  
-分支：`main`  
-功能基线提交：`d42e9f9 feat: use real organizer photos`
+分支：`agent/ai-cleaned-product-images`（PR #1）  
+当前工作提交：`9056c35 docs: prepare initial idea submission`
 
 ## 1. 项目目标
 
@@ -23,6 +23,7 @@ ListingReady 把中文商品资料和真实照片整理成可检查的 Amazon �
 - 页面展示英文 Listing 草稿、质量检查结果和参数待确认提醒。
 - 支持复制 Listing 和下载 JSON 上新包。
 - README 已提供中英文说明和本地运行命令。
+- `SUBMISSION_DRAFT.md` 已按初赛在线表单字段整理，可直接复制提交。
 - 自动测试验证页面文案、真实照片路径和禁止使用的虚构参数。
 - 2026-07-16 已修复本机预览服务漏掉 `/product/` 路由造成的图片 404；该预览服务是办公电脑的本地绕过方案，不属于仓库代码。
 
@@ -75,6 +76,12 @@ npm test
 当前测试基线：2 个测试全部通过。Lint 只有 `<img>` 性能建议和已有 PostCSS 风格警告，没有错误。三张照片体积较小，MVP 暂不增加图片优化依赖。
 
 ## 6. 下一步任务（按优先级）
+
+### P0：先提交初赛 Idea，申请百炼算力
+
+- 使用 `SUBMISSION_DRAFT.md` 填写初赛在线表单。
+- 当前作品阶段选择“已有 Demo 原型”，如实说明百炼 API 尚未接入。
+- 附上代码仓库和 PR 链接；个人报名信息由参赛者本人填写。
 
 ### P0：补齐真实商品资料
 
