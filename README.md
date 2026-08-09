@@ -43,6 +43,8 @@ npm run lint
 
 ### 参赛方案
 
+初赛在线表单可直接使用 [SUBMISSION_DRAFT.md](./SUBMISSION_DRAFT.md) 中的字段稿。
+
 ListingReady 聚焦“翻译之后、发布之前”的关键环节：先整理可信的商品事实，再生成本地化 Listing，最后提示卖家补充缺失参数并确认风险。首版只支持 Amazon 美国站和单个演示商品，以最小可用产品验证完整上新流程。
 
 ## English
