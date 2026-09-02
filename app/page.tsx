@@ -4,7 +4,15 @@ import type { FormEvent } from "react";
 import { useState } from "react";
 import "./organizer.css";
 
-const listing = {
+type Listing = {
+  title: string;
+  bullets: string[];
+  description: string;
+  searchTerms: string;
+  checks: Array<{ label: string; detail: string; tone: "pass" | "warn" }>;
+};
+
+const initialListing: Listing = {
   title:
     "Slim Desk Drawer Organizer, Pull-Out Storage Box for Pens, Cards and Small Office Supplies",
   bullets: [
@@ -26,29 +34,54 @@ const listing = {
   ],
 };
 
-const copyText = [
-  "[DRAFT FROM REAL PHOTOS — VERIFY PARAMETERS BEFORE PUBLISH]",
-  "",
-  listing.title,
-  "",
-  ...listing.bullets.map((bullet, index) => `${index + 1}. ${bullet}`),
-  "",
-  listing.description,
-  "",
-  `Search Terms: ${listing.searchTerms}`,
-].join("\n");
-
 export default function Home() {
   const [generated, setGenerated] = useState(false);
-  const [notice, setNotice] = useState("3 张真实照片已接入 · 暂未接入百炼 API");
+  const [loading, setLoading] = useState(false);
+  const [listing, setListing] = useState<Listing>(initialListing);
+  const [model, setModel] = useState<string | null>(null);
+  const [notice, setNotice] = useState("3 张真实照片已接入 · 填写商品资料后可调用百炼生成草稿");
 
-  function generate(event: FormEvent<HTMLFormElement>) {
+  async function generate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setGenerated(true);
-    setNotice("照片证据草稿已生成 · 参数待确认");
+    setLoading(true);
+    setNotice("正在调用百炼生成可检查的 Listing 草稿…");
+
+    const form = new FormData(event.currentTarget);
+    const facts = Object.fromEntries(form.entries());
+
+    try {
+      const response = await fetch("/api/generate-listing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(facts),
+      });
+      const payload = await response.json() as { error?: string; model?: string; result?: Listing };
+      if (!response.ok || !payload.result) {
+        throw new Error(payload.error ?? "生成失败，请稍后重试。");
+      }
+      setListing(payload.result);
+      setModel(payload.model ?? null);
+      setGenerated(true);
+      setNotice("百炼已生成草稿 · 请确认所有待确认参数后再发布");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "生成失败，请稍后重试。");
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function copyListing() {
+    const copyText = [
+      "[AI DRAFT — VERIFY PARAMETERS BEFORE PUBLISH]",
+      "",
+      listing.title,
+      "",
+      ...listing.bullets.map((bullet, index) => `${index + 1}. ${bullet}`),
+      "",
+      listing.description,
+      "",
+      `Search Terms: ${listing.searchTerms}`,
+    ].join("\n");
     try {
       await navigator.clipboard.writeText(copyText);
       setNotice("Listing 文案已复制");
@@ -59,7 +92,7 @@ export default function Home() {
 
   function downloadListing() {
     const file = new Blob(
-      [JSON.stringify({ source: "user_photos", verified: false, warning: "DRAFT FROM REAL PHOTOS — VERIFY PARAMETERS BEFORE PUBLISH", marketplace: "Amazon US", photoEvidence: ["scene-horizontal.jpg", "scene-stacked.jpg", "scene-drawers-open.jpg"], listing }, null, 2)],
+      [JSON.stringify({ source: "seller_facts_and_user_photos", model, verified: false, warning: "AI DRAFT — VERIFY PARAMETERS BEFORE PUBLISH", marketplace: "Amazon US", photoEvidence: ["scene-horizontal.jpg", "scene-stacked.jpg", "scene-drawers-open.jpg"], listing }, null, 2)],
       { type: "application/json" },
     );
     const url = URL.createObjectURL(file);
@@ -122,19 +155,19 @@ export default function Home() {
           </div>
 
           <div className="field-grid">
-            <label>商品名称<input name="productName" defaultValue="窄型抽屉收纳盒（照片展示横排与叠放）" required readOnly /></label>
-            <label>材质<input name="material" defaultValue="待确认（照片无法判断）" required readOnly /></label>
-            <label>尺寸<input name="dimensions" defaultValue="待测量" required readOnly /></label>
-            <label>颜色<input name="color" defaultValue="白色（照片可见）" required readOnly /></label>
-            <label className="wide">结构规格<input name="structure" defaultValue="独立单格抽屉；照片展示横排与垂直叠放，锁定结构待确认" required readOnly /></label>
-            <label className="wide">核心卖点<textarea name="features" defaultValue="半圆拉手；照片展示横排/叠放；适合文具、卡片、钱包和小物" required readOnly /></label>
+            <label>商品名称<input name="productName" defaultValue="窄型抽屉收纳盒（照片展示横排与叠放）" required /></label>
+            <label>材质<input name="material" defaultValue="待确认（照片无法判断）" /></label>
+            <label>尺寸<input name="dimensions" defaultValue="待测量" /></label>
+            <label>颜色<input name="color" defaultValue="白色（照片可见）" /></label>
+            <label className="wide">结构规格<input name="structure" defaultValue="独立单格抽屉；照片展示横排与垂直叠放，锁定结构待确认" /></label>
+            <label className="wide">核心卖点<textarea name="features" defaultValue="半圆拉手；照片展示横排/叠放；适合文具、卡片、钱包和小物" required /></label>
           </div>
 
           <button className="primary-button" type="submit">
-            {generated ? "重新生成演示上新包" : "生成上新包"}
+            {loading ? "百炼生成中…" : generated ? "重新生成上新包" : "调用百炼生成上新包"}
             <span aria-hidden="true">→</span>
           </button>
-          <p className="form-note">真实照片已接入；当前仍是参数待确认草稿，禁止直接发布。</p>
+          <p className="form-note">真实照片已接入；AI 只会依据填写事实生成草稿，待确认参数禁止直接发布。</p>
         </form>
 
         <section className="panel output-panel">
@@ -152,7 +185,7 @@ export default function Home() {
             {!generated && <div className="result-lock">填写左侧信息并点击“生成上新包”</div>}
             <div className="result-content" aria-hidden={!generated}>
               <article className="result-block">
-                <span className="result-label">Amazon Title · 真实照片草稿</span>
+                <span className="result-label">Amazon Title · AI 生成草稿{model ? ` · ${model}` : ""}</span>
                 <h3>{listing.title}</h3>
               </article>
 
@@ -169,7 +202,7 @@ export default function Home() {
               <article className="quality-block">
                 <div className="quality-heading">
                   <span className="result-label">发布前质检</span>
-                  <strong>3 项通过 · 1 项待确认</strong>
+                  <strong>{listing.checks.filter((check) => check.tone === "pass").length} 项通过 · {listing.checks.filter((check) => check.tone === "warn").length} 项待确认</strong>
                 </div>
                 <ul>
                   {listing.checks.map((check) => (

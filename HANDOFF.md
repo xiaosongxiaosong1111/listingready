@@ -48,9 +48,9 @@ ListingReady 把中文商品资料和真实照片整理成可检查的 Amazon �
 
 ## 4. 当前 AI/API 状态
 
-目前没有百炼 API Key。页面中的“生成”是用于展示流程的本地草稿，不会调用真实模型，也不能直接发布到 Amazon。
+已接入赛事 Token Plan 的 OpenAI 兼容接口。`/api/generate-listing` 在服务端调用 `qwen3.6-flash`，并要求模型只使用卖家输入的事实；前端不会接触 API Key。密钥位于本地 `.env.local` 或部署平台的 Secret 配置中，禁止写入源码、README、提交记录或浏览器端代码。
 
-赛事发放百炼 API Key/Credits 后，再根据赛事 API 文档接入服务端接口。密钥只能放在本地环境变量或部署平台的密钥配置中，禁止写入源码、README、提交记录或浏览器端代码。
+当前本地运行环境可能不允许 Worker 进程访问外部模型服务；专属 Token Plan 地址和密钥已通过独立最小请求验证。部署后需在托管平台配置同名 Secret，再从页面完成一次端到端验证。
 
 ## 5. 在另一台电脑继续
 
