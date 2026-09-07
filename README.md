@@ -1,30 +1,32 @@
 # ListingReady
 
-> 小宋1021队｜AI+跨境黑客松｜AI 智能上新
+> 小宋1021队 · AI+跨境黑客松 · AI 智能上新
 
-[中文](#中文) · [English](#english)
+ListingReady 是面向中小跨境卖家的可信 AI 上新工作台。输入有来源的商品事实，生成带事实引用的 Amazon 美国站英文草稿，检查风险，再由卖家复核导出。支持多品类资料；桌面收纳盒只是其中一个案例。
 
-## 中文
+## 当前可用
 
-ListingReady 是一个跨境商品本地化上新助手。它把中文商品资料转换成可检查的 Amazon 美国站 Listing，帮助卖家在发布前发现参数缺失、事实不一致和潜在合规风险。
+- 13 项通用事实，支持已确认 / 待确认 / 不适用及来源说明。
+- 仅发送可用的已确认事实到比赛 Token Plan。
+- 生成标题、Item Highlights、卖点、描述和搜索词，每段带可查看和修改的事实引用。
+- 独立程序检查数字、单位、部分材质和功能词、引用、宣传用语及长度。
+- 首次生成有阻断问题时，最多自动修订一次；仍有风险会展示并拦截复核导出。
+- 手工修改与免费重检，资料修改后旧结果失效。
+- 两个案例：照片人工整理的收纳盒；品牌官网资料的厨房擦拭巾。
+- 复制草稿、下载含事实和风险报告的 JSON；服务端再次检查复核导出条件。
 
-当前演示商品为可堆叠抽屉式桌面收纳盒。
+当前未接入 AI 图片识别、场景图生成或 Amazon 自动发布。事实引用来自模型，规则检查覆盖有限，需人工复核。官网示例不代表用户实际货品或品牌授权。
 
-### 功能
+## 运行
 
-- 输入中文商品图片和参数
-- 生成英文标题、五点描述、详情描述和搜索词
-- 检查事实一致性、夸张宣传及待确认字段
-- 一键复制文案或下载 JSON 上新包
-- 明确标注数据来源，避免把 AI 生成内容直接当作商品事实
+推荐 Node.js 24。保留现有 Vinext / React / Cloudflare 架构和 package-lock.json。
 
-### 当前状态
+```bash
+npm install
+npm run dev
+```
 
-当前版本已接入 3 张真实商品照片，并通过服务端调用赛事 Token Plan 的 Qwen 模型生成 Listing 草稿。模型只能使用卖家填写的商品事实；材质、尺寸、套装数量、重量、承重及是否具备锁定式堆叠结构仍待确认时，必须保留为风险提示，禁止直接发布。
-
-### Token Plan 配置
-
-复制 `.env.example` 为 `.env.local`，在本地填写专属 Key。`.env.local` 已被 Git 忽略，绝不能提交或放入浏览器端代码。
+将 `.env.example` 复制为本地 `.env.local`，仅在本地文件或托管 Secret 中填写密钥：
 
 ```text
 TOKEN_PLAN_API_KEY=replace-with-your-token-plan-key
@@ -32,68 +34,36 @@ TOKEN_PLAN_BASE_URL=https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-m
 TOKEN_PLAN_MODEL=qwen3.6-flash
 ```
 
-生成按钮会请求服务端 `/api/generate-listing`，再由该接口调用 Token Plan 的 `/chat/completions`。这样浏览器不会获得 API Key。
-
-### 本地运行
-
-要求：Node.js 22.13.0 或更高版本。
+浏览器只请求本站后端。严禁把 Key 写入前端、README 或 Git。GitHub Secret 不会自动注入本机和托管平台。
 
 ```bash
-git clone https://github.com/xiaosongxiaosong1111/listingready.git
-cd listingready
-npm install
-npm run dev
-```
-
-常用命令：
-
-```bash
-npm run build
+npm run typecheck
+npm run test:unit
 npm test
 npm run lint
 ```
 
-### 参赛方案
+默认测试不消耗 API 额度。启动开发服务后，可显式运行真实验证（会消耗额度）：
 
-ListingReady 聚焦“翻译之后、发布之前”的关键环节：先整理可信的商品事实，再生成本地化 Listing，最后提示卖家补充缺失参数并确认风险。首版只支持 Amazon 美国站和单个演示商品，以最小可用产品验证完整上新流程。
+```powershell
+$env:RUN_LIVE_TESTS='1'
+npm run test:live
+```
+
+## API
+
+- `POST /api/generate-listing`：ProductInput → GenerationResult。
+- `POST /api/check-listing`：商品资料 + Listing → 独立 RiskReport。
+- `POST /api/export-listing`：重新检查后导出草稿或人工复核包。
+
+详细数据结构、错误码、边界、测试与下一步请看 [9 月 7 日开发交接](docs/2026-09-07_核心闭环开发记录.md) 和 [复赛任务日志](docs/ListingReady_复赛开发任务日志.md)。
+
+## 规则与来源
+
+当前非媒体类标题上限为 75 字符，Item Highlights 为 125 字符；引用 [Amazon 官方 2026 年通知](https://sellercentral.amazon.com/seller-forums/discussions/t/145b6d0f-999c-4555-896c-c694bda2e470)。规则是版本化的通用检查，不保证满足所有类目政策。
+
+厨房案例来自 [IKEA RINNIG 官网](https://www.ikea.com/us/en/p/rinnig-dish-towel-white-dark-gray-patterned-20476346/)，核对日期 2026-09-07；保留原始参数和出处，不使用评论来证明性能。
 
 ## English
 
-ListingReady is an AI-assisted product localization tool for cross-border sellers. It turns Chinese product information into a reviewable Amazon US listing and flags missing specifications, factual inconsistencies, and potential compliance risks before publication.
-
-The current demo uses a stackable desktop drawer organizer as the sample product.
-
-### Features
-
-- Accepts Chinese product images and specifications
-- Generates an English title, five bullet points, product description, and search terms
-- Checks factual consistency, exaggerated claims, and fields requiring confirmation
-- Copies the listing text or downloads a JSON listing package
-- Labels the data source so AI-generated copy is not mistaken for verified product facts
-
-### Current Status
-
-The current version uses three real product photos and calls a Qwen model through the competition Token Plan from a server-side route. The model receives only seller-provided facts. Material, dimensions, pack quantity, weight, load capacity, and any locking stack mechanism still require confirmation, so the output remains a reviewable, non-publishable draft until the seller verifies them.
-
-### Run Locally
-
-Requirement: Node.js 22.13.0 or later.
-
-```bash
-git clone https://github.com/xiaosongxiaosong1111/listingready.git
-cd listingready
-npm install
-npm run dev
-```
-
-Useful commands:
-
-```bash
-npm run build
-npm test
-npm run lint
-```
-
-### Competition Proposal
-
-ListingReady focuses on the critical step between translation and publication. It structures trusted product facts, generates a localized listing, and asks the seller to confirm missing details and possible risks. The MVP supports one demo product for Amazon US to validate the complete listing workflow with the smallest practical scope.
+ListingReady helps cross-border sellers turn confirmed product facts into a reviewable Amazon US listing. It supports multiple product categories, explicit fact sources, AI-generated copy with citations, deterministic checks, manual editing, and export gates. Citations are proposed by the model and require human verification. Scene-image generation and automatic marketplace publishing are not implemented in this release.

@@ -16,7 +16,7 @@ async function render() {
   );
 }
 
-test("renders the ListingReady organizer demo with real photos", async () => {
+test("renders a multi-category fact workspace without fabricated AI results", async () => {
   const response = await render();
   assert.equal(response.status, 200);
 
@@ -25,13 +25,16 @@ test("renders the ListingReady organizer demo with real photos", async () => {
   assert.match(html, /小宋1021队/);
   assert.match(html, /Amazon 美国站/);
   assert.match(html, /窄型抽屉收纳盒/);
-  assert.match(html, /Slim Desk Drawer Organizer/);
+  assert.match(html, /厨房毛巾/);
+  assert.match(html, /填写我的商品/);
   assert.match(html, /\/product\/scene-horizontal\.jpg/);
   assert.match(html, /\/product\/scene-stacked\.jpg/);
   assert.match(html, /\/product\/scene-drawers-open\.jpg/);
-  assert.match(html, /真实照片[\s\S]*草稿[\s\S]*禁止直接发布/);
-  assert.match(html, /参数待确认/);
-  assert.match(html, /生成上新包/);
+  assert.match(html, /尚未接入 AI 图片识别/);
+  assert.match(html, /等待生成/);
+  assert.match(html, /生成英文 Listing/);
+  assert.match(html, /75/);
+  assert.match(html, /导出人工复核包/);
   assert.doesNotMatch(html, /手机支架|phone stand|tablet holder|4-12\.9/i);
   assert.doesNotMatch(html, /\bmock\b|\bplastic\b|PP 塑料|2 Drawers|Two pull-out drawers|two-drawer|2 个抽屉|24 × 17 × 14|演示图形|class="organizer"|\bmodular\b|\bstackable\b/i);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/);
@@ -44,9 +47,9 @@ test("keeps required project and photo assets", async () => {
     readFile(new URL("../package.json", import.meta.url), "utf8"),
   ]);
 
-  assert.match(page, /商品信息/);
-  assert.match(page, /发布前质检/);
-  assert.match(page, /下载 JSON/);
+  assert.match(page, /商品事实档案/);
+  assert.match(page, /发布前风险检查/);
+  assert.match(page, /下载草稿 JSON/);
   assert.match(layout, /lang="zh-CN"/);
   assert.doesNotMatch(page, /_sites-preview|SkeletonPreview/);
   assert.doesNotMatch(layout, /Starter Project/);
@@ -58,4 +61,16 @@ test("keeps required project and photo assets", async () => {
     access(new URL("public/product/scene-stacked.jpg", root)),
     access(new URL("public/product/scene-drawers-open.jpg", root)),
   ]);
+});
+
+test("production Worker routes enforce export checks", async () => {
+  const { default: worker } = await import(new URL("../dist/server/index.js", import.meta.url));
+  const { organizerDemo } = await import("../lib/demos.ts");
+  const { organizerListing } = await import("./fixtures.mjs");
+  const response = await worker.fetch(new Request("http://localhost/api/export-listing", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ profile: organizerDemo(), listing: organizerListing(), mode: "reviewed", humanReviewed: true }),
+  }), { ASSETS: { fetch: async () => new Response(null, { status: 404 }) } }, { waitUntil() {}, passThroughOnException() {} });
+  assert.equal(response.status, 409);
+  assert.equal((await response.json()).code, "REVIEW_REQUIRED");
 });

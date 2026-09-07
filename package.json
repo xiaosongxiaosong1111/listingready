@@ -9,7 +9,10 @@
     "dev": "vinext dev",
     "build": "vinext build",
     "start": "vinext start",
-    "test": "npm run build && node --test tests/rendered-html.test.mjs",
+    "test": "npm run test:unit && npm run build && node --experimental-strip-types --test tests/rendered-html.test.mjs",
+    "test:unit": "node --experimental-strip-types --test tests/core.test.mjs",
+    "typecheck": "tsc --noEmit --incremental false",
+    "test:live": "node --experimental-strip-types scripts/live-smoke.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
   },
   "dependencies": {

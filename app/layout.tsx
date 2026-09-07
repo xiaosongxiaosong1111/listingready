@@ -2,8 +2,8 @@
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ListingReady｜跨境商品本地化上新助手",
-  description: "把中文商品资料转成可检查的 Amazon 美国站 Listing。",
+  title: "ListingReady｜可信 AI 跨境上新工作台",
+  description: "整理多品类商品事实，生成带引用的 Amazon 美国站英文文案，检查风险并导出人工复核资料包。",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
