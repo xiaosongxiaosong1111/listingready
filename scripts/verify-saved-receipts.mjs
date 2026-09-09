@@ -4,6 +4,12 @@ import { readFile, writeFile } from "node:fs/promises";
 import { normalizeProfile } from "../lib/facts.ts";
 import { validateListing } from "../lib/validate.ts";
 const origin = process.env.TEST_ORIGIN ?? "http://localhost:3000";
+const accessToken = process.env.SITE_TEST_ACCESS_TOKEN;
+const headers = { "Content-Type": "application/json" };
+if (accessToken) {
+  if (origin !== "https://listingready-demo.coral-rose-4718.chatgpt.site") throw new Error("Private Site access credential is restricted to the existing approved Site origin.");
+  headers["OAI-Sites-Authorization"] = `Bearer ${accessToken}`;
+}
 const file = process.argv[2];
 if (!file) throw new Error("Provide a saved live-stability JSON receipt file.");
 const receipts = JSON.parse(await readFile(file, "utf8"));
@@ -13,7 +19,7 @@ for (const receipt of receipts) {
   const { profile, listing } = receipt.result;
   const expected = validateListing(normalizeProfile(profile), listing);
   async function post(path, body) {
-    const response = await fetch(origin + path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: AbortSignal.timeout(15000) });
+    const response = await fetch(origin + path, { method: "POST", headers, redirect: "manual", body: JSON.stringify(body), signal: AbortSignal.timeout(15000) });
     assert.equal(response.headers.get("cache-control"), "no-store");
     return { status: response.status, body: await response.json() };
   }
@@ -28,5 +34,5 @@ for (const receipt of receipts) {
 }
 assert.ok(outcomes.length > 0);
 const output = `outputs/saved-receipts-check-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
-await writeFile(output, JSON.stringify({ testedAt: new Date().toISOString(), modelCalls: 0, source: file, outcomes }, null, 2));
+await writeFile(output, JSON.stringify({ testedAt: new Date().toISOString(), origin, modelCalls: 0, source: file, outcomes }, null, 2));
 console.log(JSON.stringify({ verified: outcomes.length, httpRequests: outcomes.length * 3, modelCalls: 0, output }));

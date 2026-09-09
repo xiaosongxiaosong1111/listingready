@@ -20,6 +20,7 @@ const CLAIMS: Array<{ label: string; match: RegExp; evidence: RegExp; key: FactK
   { label: "吸水性能", match: /\b(?:super[ -]?absorbent|highly absorbent|quick[ -]dry(?:ing)?|lint[ -]free)\b/i, evidence: /super[ -]?absorbent|highly absorbent|quick[ -]dry|lint[ -]free|强吸水|速干|不掉毛/i, key: "features" },
   { label: "耐用与使用寿命", match: /\b(?:durable|durability|long[ -]lasting|built to last)\b/i, evidence: /\b(?:durable|durability|long[ -]lasting|built to last)\b|耐用|使用寿命/i, key: "features" },
   { label: "可靠性能", match: /\b(?:reliable performance|reliably performs?|consistent performance)\b/i, evidence: /\b(?:reliable performance|reliably performs?|consistent performance)\b|可靠性能|性能可靠/i, key: "features" },
+  { label: "泛化清洁用途", match: /\b(?:household|general(?:[ -]purpose)?|multi[ -]?purpose|all[ -]?purpose)\s+cleaning\b/i, evidence: /\b(?:household|general(?:[ -]purpose)?|multi[ -]?purpose|all[ -]?purpose)\s+cleaning\b|家居清洁|家务清洁|通用清洁|多用途清洁/i, key: "useCases" },
 ];
 
 // Conservative clause-level evidence check, not a semantic truth engine.
@@ -101,6 +102,11 @@ export function validateListing(profile: ProductProfile, listing: Listing): Risk
     const prohibited = /\b(?:best|perfect|no\.?\s*1|number\s*one|guaranteed|money[ -]back|fda|ce certified|certified|antibacterial|anti[ -]bacterial|cure|cures|treats|medical[ -]grade|non[ -]toxic|bpa[ -]free|food[ -]safe|eco[ -]friendly)\b|100\s*%\s*(?:safe|effective|guarantee)/i;
     if (prohibited.test(normalizedText)) issue("restricted", "高风险宣传用语", "本版保守拦截排名、保证、医疗、环保与认证等声明，需专门核验后再使用。", normalizedText.match(prohibited)?.[0]);
     const brand = allowed.get("brand")?.value.normalize("NFKC").toLowerCase().trim();
+    // A list of colors is not evidence that the buyer can select a variant.
+    const variantChoice = /\b(?:available|comes?|offered)\s+in\b[^.!?;\n]{0,140}\b(?:options|variations|variants)\b|\bcolou?r\s+(?:options|choices|variants)\b|\b(?:choose|select)\s+(?:from|between)\b/i;
+    if (part.factIds.includes("color") && variantChoice.test(normalizedText) && !positiveEvidence(allowed.get("color")?.value ?? "", /\b(?:options|choices|variants|variations|selectable)\b|可选|任选/i)) {
+      add({ id: `${field}.colorVariants`, severity: "warn", label: "颜色不等于可选款式", detail: "已确认颜色未说明购买时可选款式。请删除 options / select 等选择承诺，或核对实际 SKU 选项并补充来源。", field, factIds: ["color"], excerpt: normalizedText.match(variantChoice)?.[0] });
+    }
     // Only explicit brand markers are machine-detectable here. This is not a
     // general named-entity/trademark checker; arbitrary invented names need review.
     const brandClaims = [...part.text.normalize("NFKC").matchAll(/\b(?:brand\s*:\s*|manufactured by\s+|made by\s+)([\p{L}\p{N}][\p{L}\p{N} '&-]{0,79})/giu)];

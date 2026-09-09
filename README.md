@@ -1,6 +1,6 @@
 # ListingReady
 
-> 本地版本状态（2026-09-09 晚间）：66 项自动测试、类型检查及生产构建通过；10 份历史结果按最新规则完成 30 次无模型接口复检。文本“待确认隔离 → 确认事实 → 重新生成 → 新旧对照”已真实验证。图片仍是未通过外观保真验收的实验功能，复制与下载落盘仍缺端到端证据。线上仍为 9 月 7 日旧版。先读 [最新续接检查点](docs/2026-09-09_晚间续接检查点.md)。
+> 最新状态（2026-09-10）：68 项测试、类型检查和生产构建通过。新增用途泛化与颜色选择承诺检查。私有站点已更新并完成真实文本调用，但人工发现的语义遗漏仍需修正；最新发布/复检状态以 [定时续做与发布记录](docs/2026-09-10_定时续做与发布记录.md) 为准。图片保真、复制与下载落盘仍未完整验收。
 
 > 小宋1021队 · AI+跨境黑客松 · AI 智能上新
 
@@ -23,9 +23,9 @@ ListingReady 是面向中小跨境卖家的可信 AI 上新工作台。输入有
 ## 验收与发布边界
 
 - 历史提示词 v3 的连续 10 次结构化文本请求为 10/10 成功，共 13 次物理调用，不能解释为事实准确率 100%，也不是新提示词 v4 的连续测试。
-- 当前文本提示词：facts-only.v4.2026-09-09；风险规则：amazon-us-non-media-2026-09-09.v4；图片提示词：reference-preserving.v3.2026-09-09。
+- 当前文本提示词：facts-only.v5.2026-09-10；风险规则：amazon-us-non-media-2026-09-10.v5；图片提示词：reference-preserving.v3.2026-09-09。
 - 自动化测试通过不等于全部用户流程已验收。复制的实际粘贴、下载文件落盘、新图片复核门槛的浏览器事件仍待补验。
-- [线上体验](https://listingready-demo.coral-rose-4718.chatgpt.site/) 为本人私有旧版，未向评委开放。发布前按最新交接记录核对，不把本地能力自动算成线上能力。
+- [线上体验](https://listingready-demo.coral-rose-4718.chatgpt.site/) 仍为本人私有，未向评委开放；浏览器需登录。线上版本和源码对应关系见最新发布记录，原 GitHub 推送目前受连接权限阻挡。
 - 当前无数据库；刷新会丢失未保存的会话，图片链接可能过期。模型元数据和人工复核声明未经服务端签名。
 
 ## 运行
@@ -79,4 +79,4 @@ npm run test:live
 
 ## English
 
-ListingReady helps cross-border sellers turn confirmed product facts into a reviewable Amazon US listing. The local version supports multiple categories, fact sources, AI copy with citations, deterministic checks, editing, comparisons and export gates. Scene generation is experimental: product fidelity has not passed acceptance. Citations and images require human review. Image recognition and automatic marketplace publishing are not implemented. The hosted owner-private demo remains on the older September 7 version.
+ListingReady helps cross-border sellers turn confirmed product facts into a reviewable Amazon US listing. It supports multiple categories, fact sources, AI copy with citations, deterministic checks, editing, comparisons and export gates. Scene generation is experimental: product fidelity has not passed acceptance. Citations and images require human review. Image recognition and automatic marketplace publishing are not implemented. The hosted demo remains owner-private; see the latest deployment log for its exact source version and remaining acceptance gaps.

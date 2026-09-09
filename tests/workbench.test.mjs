@@ -137,3 +137,26 @@ test("pack of a material percentage is not misread as a pack quantity", () => {
   const l = towelListing(); l.itemHighlights = { text: "Pack of 100 towels.", factIds: ["packQuantity", "material", "productName"] };
   assert.ok(validateListing(profile, l).checks.some(c => c.id === "itemHighlights.measurement.100.pack"));
 });
+
+test("specific dish drying evidence cannot justify general household cleaning", () => {
+  const p = towelDemo(), l = towelListing();
+  l.bullets[3] = { text: "For kitchen dish drying and daily household cleaning tasks.", factIds: ["useCases"] };
+  assert.ok(validateListing(normalizeProfile(p), l).checks.some(c => c.id.includes("泛化清洁用途") && c.severity === "block"));
+  p.facts.find(f => f.key === "useCases").value = "General household cleaning / 家务清洁";
+  assert.equal(validateListing(normalizeProfile(p), l).checks.some(c => c.id.includes("泛化清洁用途")), false);
+  p.facts.find(f => f.key === "useCases").value = "Not for household cleaning";
+  assert.ok(validateListing(normalizeProfile(p), l).checks.some(c => c.id.includes("泛化清洁用途")));
+});
+
+test("color lists do not establish selectable purchase variants", () => {
+  const p = towelDemo(), l = towelListing();
+  for (const text of ["Available in white, dark gray, and patterned color options.", "Customers may select from white, dark gray, or patterned variations.", "The towel comes in a 4 pack featuring white and patterned options."]) {
+    l.description = { text, factIds: ["color", "packQuantity"] };
+    assert.ok(validateListing(normalizeProfile(p), l).checks.some(c => c.id === "description.colorVariants" && c.severity === "warn"));
+  }
+  l.description = { text: "White, dark gray and patterned towels.", factIds: ["color"] };
+  assert.equal(validateListing(normalizeProfile(p), l).checks.some(c => c.id === "description.colorVariants"), false);
+  p.facts.find(f => f.key === "color").value = "White and dark gray selectable options / 白色及深灰色可选";
+  l.description = { text: "Select from white and dark gray.", factIds: ["color"] };
+  assert.equal(validateListing(normalizeProfile(p), l).checks.some(c => c.id === "description.colorVariants"), false);
+});

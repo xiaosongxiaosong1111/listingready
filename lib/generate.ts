@@ -5,7 +5,7 @@ import { parseModelJson } from "./listing.ts";
 import { validateListing } from "./validate.ts";
 import { localizationPlan } from "./localization.ts";
 
-export const PROMPT_VERSION = "facts-only.v4.2026-09-09";
+export const PROMPT_VERSION = "facts-only.v5.2026-09-10";
 export const TOKEN_PLAN_ORIGIN = "https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1";
 export type ModelConfig = { apiKey?: string; baseUrl?: string; model?: string };
 type Dependencies = { fetch?: typeof fetch; timeoutMs?: number };
@@ -15,6 +15,7 @@ export function buildMessages(profile: ProductProfile) {
     { role: "user", content: JSON.stringify({ confirmedFacts: confirmedFacts(profile), editorialStrategy: { priorityFactIds: localizationPlan(profile).priority.map(p => p.factId), rules: localizationPlan(profile).rules }, prohibitedPhrases: profile.bannedTerms, outputRequirement: "factIds must be nonempty on EVERY output field, including searchTerms. Search terms are sourced from the same confirmed facts; cite material if using cotton, for example." }) },
   ];
   messages[0].content += " Do not add filler claims such as durable, long-lasting, reliable performance, effortless, premium quality or easy cleaning merely to make the copy persuasive. A material or care instruction does not prove performance or lifespan. A confirmed negative statement (not waterproof, not stackable) NEVER supports its positive version. Keep negative limitations intact or omit the claim entirely. Prefer concise direct factual statements over lifestyle promises. Remove repeated search words before returning.";
+  messages[0].content += " Preserve the exact scope of the confirmed use case: kitchen dish drying is not general household cleaning. Multiple color names do not imply selectable options, available variants, buyer choice or pack assortment. Describe only the confirmed colors unless the facts explicitly establish those commercial options. Cite packQuantity when saying a set contains multiple units.";
   return messages;
 }
 export async function generateListing(input: unknown, config: ModelConfig, deps: Dependencies = {}): Promise<GenerationResult> {

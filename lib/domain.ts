@@ -45,7 +45,7 @@ export type GenerationResult = {
   generation: { model: string; provider: "aliyun-token-plan"; promptVersion: string; durationMs: number; attempts: number; totalTokens: number | null; formatFailures: number; riskRepairs: number; upstreamRetries: number };
 };
 export const RULES = {
-  version: "amazon-us-non-media-2026-09-09.v4",
+  version: "amazon-us-non-media-2026-09-10.v5",
   titleMax: 75, highlightsMax: 125, searchTermsMaxBytes: 249,
   // Internal editorial limits, not category-specific Amazon guarantees.
   bulletMax: 500, descriptionMax: 2000,
