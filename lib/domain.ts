@@ -15,10 +15,10 @@ export const FACT_DEFINITIONS = [
 ] as const;
 
 export type FactKey = typeof FACT_DEFINITIONS[number]["key"];
-export type FactStatus = "confirmed" | "pending" | "not_applicable";
+export type FactStatus = "confirmed" | "pending" | "not_applicable" | "rejected";
 export const SOURCE_LABELS = {
   seller: "卖家填写", packaging: "商品包装", supplier: "供应商资料",
-  photo: "实物照片（人工观察）", official: "品牌官网", manual: "人工测量 / 确认",
+  photo: "实物照片（人工观察）", official: "品牌官网", manual: "人工测量 / 确认", ai_inference: "AI 推断（非证据）",
 } as const;
 export type FactSource = keyof typeof SOURCE_LABELS;
 export type ProductFact = { key: FactKey; value: string; status: FactStatus; source: FactSource; sourceNote: string };
@@ -42,10 +42,10 @@ export type RiskReport = {
 export type GenerationResult = {
   schemaVersion: 1; id: string; generatedAt: string; profile: ProductProfile;
   listing: Listing; report: RiskReport;
-  generation: { model: string; provider: "aliyun-token-plan"; promptVersion: string; durationMs: number; attempts: number; totalTokens: number | null };
+  generation: { model: string; provider: "aliyun-token-plan"; promptVersion: string; durationMs: number; attempts: number; totalTokens: number | null; formatFailures: number; riskRepairs: number; upstreamRetries: number };
 };
 export const RULES = {
-  version: "amazon-us-non-media-2026-09-07.v1",
+  version: "amazon-us-non-media-2026-09-09.v4",
   titleMax: 75, highlightsMax: 125, searchTermsMaxBytes: 249,
   // Internal editorial limits, not category-specific Amazon guarantees.
   bulletMax: 500, descriptionMax: 2000,

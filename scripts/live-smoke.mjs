@@ -25,5 +25,5 @@ for (const [name, profile] of [["organizer", organizerDemo()], ["towel", towelDe
   console.log(JSON.stringify({ name, httpStatus: response.status, title: result.listing.title.text, ...result.generation, counts: result.report.counts, findings: result.report.checks.filter(c => c.severity !== "pass").map(c => ({ id: c.id, detail: c.detail })) }));
 }
 await mkdir("outputs", { recursive: true });
-await writeFile("outputs/live-smoke-2026-09-07.json", JSON.stringify(receipts, null, 2));
+await writeFile(`outputs/live-smoke-${new Date().toISOString().replace(/[:.]/g, "-")}.json`, JSON.stringify(receipts, null, 2));
 console.log("Live HTTP generation, recheck and export checks passed for both cases.");

@@ -74,3 +74,21 @@ test("production Worker routes enforce export checks", async () => {
   assert.equal(response.status, 409);
   assert.equal((await response.json()).code, "REVIEW_REQUIRED");
 });
+
+test("production image route rejects invalid HTTP requests before model access", async () => {
+  const { default: worker } = await import(new URL("../dist/server/index.js", import.meta.url));
+  const cases = [
+    { headers: { "Content-Type": "text/plain" }, body: "{}", status: 415, code: "CONTENT_TYPE" },
+    { headers: { "Content-Type": "application/json", Origin: "https://untrusted.example" }, body: "{}", status: 403, code: "CROSS_ORIGIN" },
+    { headers: { "Content-Type": "application/json" }, body: "not-json", status: 400, code: "INVALID_JSON" },
+    { headers: { "Content-Type": "application/json" }, body: "x".repeat(1700001), status: 413, code: "BODY_TOO_LARGE" },
+  ];
+  for (const item of cases) {
+    const response = await worker.fetch(new Request("http://localhost/api/generate-scene", { method: "POST", headers: item.headers, body: item.body }),
+      { ASSETS: { fetch: async () => new Response(null, { status: 404 }) } }, { waitUntil() {}, passThroughOnException() {} });
+    assert.equal(response.status, item.status);
+    assert.equal(response.headers.get("cache-control"), "no-store");
+    assert.equal(response.headers.get("x-content-type-options"), "nosniff");
+    assert.equal((await response.json()).code, item.code);
+  }
+});

@@ -1,21 +1,32 @@
 # ListingReady
 
+> 本地版本状态（2026-09-09 晚间）：66 项自动测试、类型检查及生产构建通过；10 份历史结果按最新规则完成 30 次无模型接口复检。文本“待确认隔离 → 确认事实 → 重新生成 → 新旧对照”已真实验证。图片仍是未通过外观保真验收的实验功能，复制与下载落盘仍缺端到端证据。线上仍为 9 月 7 日旧版。先读 [最新续接检查点](docs/2026-09-09_晚间续接检查点.md)。
+
 > 小宋1021队 · AI+跨境黑客松 · AI 智能上新
 
 ListingReady 是面向中小跨境卖家的可信 AI 上新工作台。输入有来源的商品事实，生成带事实引用的 Amazon 美国站英文草稿，检查风险，再由卖家复核导出。支持多品类资料；桌面收纳盒只是其中一个案例。
 
-## 当前可用
+## 当前本地已实现
 
-- 13 项通用事实，支持已确认 / 待确认 / 不适用及来源说明。
+- 13 项通用事实，支持已确认 / 待确认 / 已否定 / 不适用及来源说明；仅 AI 推断的内容不可成为证据。
 - 仅发送可用的已确认事实到比赛 Token Plan。
 - 生成标题、Item Highlights、卖点、描述和搜索词，每段带可查看和修改的事实引用。
 - 独立程序检查数字、单位、部分材质和功能词、引用、宣传用语及长度。
 - 首次生成有阻断问题时，最多自动修订一次；仍有风险会展示并拦截复核导出。
-- 手工修改与免费重检，资料修改后旧结果失效。
+- 手工修改与免费重检、风险定位、完整的新旧文案及引用对照，资料修改后旧结果失效。
 - 两个案例：照片人工整理的收纳盒；品牌官网资料的厨房擦拭巾。
-- 复制草稿、下载含事实和风险报告的 JSON；服务端再次检查复核导出条件。
+- 分段复制、准备含事实和风险报告的 JSON、完整内容预览及保存链接；服务端再次检查复核导出条件。文件准备成功不代表实际落盘。
+- 上传已授权参考图，经比赛图像接口尝试生成营销场景素材；与原图并排复核，只有当前图片加载成功后才可勾选外观复核。
 
-当前未接入 AI 图片识别、场景图生成或 Amazon 自动发布。事实引用来自模型，规则检查覆盖有限，需人工复核。官网示例不代表用户实际货品或品牌授权。
+未接入 AI 图片识别或 Amazon 自动发布。场景图接口已打通，但 v1–v3 实测仍出现部件、视角或标签变化，不承诺商品保真，不可作为实拍或 Amazon 主图。事实引用来自模型，规则检查覆盖有限，需人工复核。官网示例不代表用户实际货品或品牌授权。
+
+## 验收与发布边界
+
+- 历史提示词 v3 的连续 10 次结构化文本请求为 10/10 成功，共 13 次物理调用，不能解释为事实准确率 100%，也不是新提示词 v4 的连续测试。
+- 当前文本提示词：facts-only.v4.2026-09-09；风险规则：amazon-us-non-media-2026-09-09.v4；图片提示词：reference-preserving.v3.2026-09-09。
+- 自动化测试通过不等于全部用户流程已验收。复制的实际粘贴、下载文件落盘、新图片复核门槛的浏览器事件仍待补验。
+- [线上体验](https://listingready-demo.coral-rose-4718.chatgpt.site/) 为本人私有旧版，未向评委开放。发布前按最新交接记录核对，不把本地能力自动算成线上能力。
+- 当前无数据库；刷新会丢失未保存的会话，图片链接可能过期。模型元数据和人工复核声明未经服务端签名。
 
 ## 运行
 
@@ -32,6 +43,7 @@ npm run dev
 TOKEN_PLAN_API_KEY=replace-with-your-token-plan-key
 TOKEN_PLAN_BASE_URL=https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1
 TOKEN_PLAN_MODEL=qwen3.6-flash
+TOKEN_PLAN_IMAGE_MODEL=qwen-image-2.0
 ```
 
 浏览器只请求本站后端。严禁把 Key 写入前端、README 或 Git。GitHub Secret 不会自动注入本机和托管平台。
@@ -55,6 +67,7 @@ npm run test:live
 - `POST /api/generate-listing`：ProductInput → GenerationResult。
 - `POST /api/check-listing`：商品资料 + Listing → 独立 RiskReport。
 - `POST /api/export-listing`：重新检查后导出草稿或人工复核包。
+- `POST /api/generate-scene`：已授权参考图与已确认外观资料 → 实验性场景图片；不自动重试。
 
 详细数据结构、错误码、边界、测试与下一步请看 [9 月 7 日开发交接](docs/2026-09-07_核心闭环开发记录.md) 和 [复赛任务日志](docs/ListingReady_复赛开发任务日志.md)。
 
@@ -66,4 +79,4 @@ npm run test:live
 
 ## English
 
-ListingReady helps cross-border sellers turn confirmed product facts into a reviewable Amazon US listing. It supports multiple product categories, explicit fact sources, AI-generated copy with citations, deterministic checks, manual editing, and export gates. Citations are proposed by the model and require human verification. Scene-image generation and automatic marketplace publishing are not implemented in this release.
+ListingReady helps cross-border sellers turn confirmed product facts into a reviewable Amazon US listing. The local version supports multiple categories, fact sources, AI copy with citations, deterministic checks, editing, comparisons and export gates. Scene generation is experimental: product fidelity has not passed acceptance. Citations and images require human review. Image recognition and automatic marketplace publishing are not implemented. The hosted owner-private demo remains on the older September 7 version.
