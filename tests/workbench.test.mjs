@@ -8,6 +8,49 @@ import { createExport } from "../lib/export.ts";
 import { localizationPlan, localizationText } from "../lib/localization.ts";
 import { exportFilename, factChanges, fieldLabel, listingComparison, riskTargets } from "../lib/workbench.ts";
 import { towelListing } from "./fixtures.mjs";
+import { exportMarkdown } from "../lib/export-report.ts";
+
+test("Markdown report preserves current copy, all facts, warnings and draft status", () => {
+  const p = towelDemo(); p.facts.find(f => f.key === "material").status = "pending";
+  const listing = towelListing(); listing.description.text = "Updated current copy <script>alert(1)</script> [click](https://example.com)";
+  const bundle = createExport({ profile: p, listing, mode: "draft" });
+  const md = exportMarkdown(bundle);
+  assert.match(md, /未完成复核的 AI 草稿/);
+  assert.match(md, /Updated current copy/);
+  assert.match(md, /&lt;script&gt;/);
+  assert.doesNotMatch(md, /<script>|\[click\]\(https:/);
+  assert.match(md, /材质待确认/);
+  assert.match(md, /无依据材质/);
+  assert.match(md, /100% cotton/);
+  assert.equal((md.match(/确认状态：/g) ?? []).length, 13);
+  assert.ok(md.includes(`阻断 ${bundle.report.counts.block} 项`));
+});
+
+test("pull-out access does not prove speed or undisturbed surroundings", () => {
+  const profile = normalizeProfile(organizerDemo());
+  for (const text of ["Quick retrieval of stationery.", "Items can be retrieved quickly.", "Instant access.", "Access without disrupting surrounding objects.", "Access without moving other items."]) {
+    const listing = towelListing(); listing.description = { text, factIds: ["features", "structure"] };
+    assert.ok(validateListing(profile, listing).checks.some(c => c.field === "description" && c.severity === "block" && /取物/.test(c.detail + c.label)), text);
+  }
+  const listing = towelListing(); listing.description = { text: "Pull-out access for stationery.", factIds: ["features"] };
+  assert.ok(!validateListing(profile, listing).checks.some(c => c.field === "description" && /取物/.test(c.detail + c.label)));
+});
+
+test("speed claims require positive cited evidence, not a negative specification", () => {
+  for (const value of ["Quick retrieval", "not quick retrieval", "快速取物"]) {
+    const p = towelDemo(); p.facts.find(f => f.key === "features").value = value;
+    const listing = towelListing(); listing.description = { text: "Quick retrieval.", factIds: ["features"] };
+    const flagged = validateListing(normalizeProfile(p), listing).checks.some(c => c.field === "description" && c.id.includes("取物速度"));
+    assert.equal(flagged, value.startsWith("not"));
+  }
+});
+
+test("collection variations and available finishes do not follow from a color list", () => {
+  for (const text of ["The collection includes white, dark gray, and patterned variations.", "The available finishes are white, dark gray, and patterned."]) {
+    const listing = towelListing(); listing.description = { text, factIds: ["color"] };
+    assert.ok(validateListing(normalizeProfile(towelDemo()), listing).checks.some(c => c.id === "description.colorVariants"), text);
+  }
+});
 
 test("rejected facts and even confirmed AI inferences never enter the model", () => {
   for (const change of [{ status: "rejected" }, { status: "confirmed", source: "ai_inference" }]) {

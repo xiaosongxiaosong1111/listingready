@@ -9,6 +9,8 @@ import { listingText } from "../lib/listing";
 import { factExclusion } from "../lib/facts";
 import { localizationPlan, localizationText } from "../lib/localization";
 import { exportFilename, fieldLabel, riskTargets, STATUS_LABELS } from "../lib/workbench";
+import { exportMarkdown } from "../lib/export-report";
+import type { createExport } from "../lib/export";
 import { ListingComparison } from "./listing-comparison";
 import { SceneWorkbench } from "./scene-workbench";
 import type { SceneAttachment } from "./scene-workbench";
@@ -36,7 +38,7 @@ export default function Home() {
   const [edited, setEdited] = useState(false);
   const [report, setReport] = useState<RiskReport | null>(null);
   const [reviewed, setReviewed] = useState(false);
-  const [preparedExport, setPreparedExport] = useState<{ key: string; url: string; filename: string; content: string } | null>(null);
+  const [preparedExport, setPreparedExport] = useState<{ key: string; url: string; filename: string; content: string; format: "json" | "md" } | null>(null);
   const [busy, setBusy] = useState<"generate" | "check" | "export" | "image" | null>(null);
   const [notice, setNotice] = useState("选择案例，或直接填写自己的商品。名称和核心功能需有已确认的内容及来源。");
   const [error, setError] = useState(false);
@@ -118,16 +120,16 @@ export default function Home() {
     element.scrollIntoView({ block: "center", behavior: "instant" });
     element.focus({ preventScroll: true });
   }
-  async function download(mode: "draft" | "reviewed") {
+  async function download(mode: "draft" | "reviewed", format: "json" | "md" = "json") {
     if (!snapshot || stale || inflight.current) return;
     inflight.current = true; setBusy("export");
     try {
-      const bundle = await post<Record<string, unknown>>("/api/export-listing", { profile: product, listing: snapshot.result.listing, mode, humanReviewed: reviewed, marketingImage: currentImage });
+      const bundle = await post<ReturnType<typeof createExport>>("/api/export-listing", { profile: product, listing: snapshot.result.listing, mode, humanReviewed: reviewed, marketingImage: currentImage });
       const payload = { ...bundle, generation: snapshot.result.generation, generationId: snapshot.result.id, generatedAt: snapshot.result.generatedAt, editedAfterGeneration: edited, provenanceNotice: "生成元数据来自本次浏览器会话，未进行服务端签名认证。" };
-      const content = JSON.stringify(payload, null, 2);
-      const url = URL.createObjectURL(new Blob([content], { type: "application/json" }));
-      setPreparedExport({ key: exportKey, url, content, filename: exportFilename(product.facts.find(f => f.key === "productName")?.value ?? "", mode) });
-      message("文件已准备好，请点击“保存 JSON 文件”。如浏览器未下载，可展开内容自行保存；准备成功不代表文件已经落盘。");
+      const content = format === "md" ? exportMarkdown(bundle) : JSON.stringify(payload, null, 2);
+      const url = URL.createObjectURL(new Blob([content], { type: format === "md" ? "text/markdown;charset=utf-8" : "application/json" }));
+      setPreparedExport({ key: exportKey, url, content, format, filename: exportFilename(product.facts.find(f => f.key === "productName")?.value ?? "", mode).replace(/\.json$/, format === "md" ? ".md" : ".json") });
+      message(`文件已准备好，请点击“保存 ${format === "md" ? "Markdown" : "JSON"} 文件”。如浏览器未下载，可展开内容自行保存；准备成功不代表文件已经落盘。`);
     } catch (e) { message(e instanceof Error ? e.message : "导出失败。", true); }
     finally { inflight.current = false; setBusy(null); }
   }
@@ -225,10 +227,11 @@ export default function Home() {
             {currentImage && !currentImage.humanReviewed && <p className="stale-warning">当前场景图尚未通过人工外观复核；仍可下载草稿。</p>}
             <label className="review-checkbox"><input type="checkbox" checked={reviewed} disabled={!!busy || stale || !report?.canExportReviewed} onChange={e => setReviewed(e.target.checked)} /><span>我已对照原始商品资料，人工检查全部文案与引用。</span></label>
             <div className="export-actions"><button className="wb-secondary" disabled={!snapshot || stale || !!busy} onClick={copy}>复制草稿</button><button className="wb-secondary" disabled={!snapshot || stale || !!busy} onClick={() => download("draft")}>下载草稿 JSON</button><button className="wb-primary" disabled={!snapshot || stale || !!busy || !report?.canExportReviewed || !reviewed || (!!currentImage && !currentImage.humanReviewed)} onClick={() => download("reviewed")}>导出人工复核包</button></div>
+            <button className="wb-secondary" disabled={!snapshot || stale || !!busy} onClick={() => download("draft", "md")}>下载 Markdown 审阅报告</button>
             {currentExport && !stale && !busy && <div className="prepared-export">
               <p className="help">已准备：{currentExport.filename}。修改事实、文案、复核状态或图片后需重新准备文件。</p>
-              <a className="wb-secondary image-link" href={currentExport.url} download={currentExport.filename}>保存 JSON 文件</a>
-              <details><summary>预览完整导出内容</summary><label className="field-label" htmlFor="export-content">导出 JSON 内容</label><textarea id="export-content" readOnly rows={12} value={currentExport.content} spellCheck={false} /><p className="help">此处与保存文件使用完全相同的内容。不含 API Key；请保留事实来源、风险报告和草稿标识。</p></details>
+              <a className="wb-secondary image-link" href={currentExport.url} download={currentExport.filename}>保存 {currentExport.format === "md" ? "Markdown" : "JSON"} 文件</a>
+              <details><summary>预览完整导出内容</summary><label className="field-label" htmlFor="export-content">导出 {currentExport.format === "md" ? "Markdown" : "JSON"} 内容</label><textarea id="export-content" readOnly rows={12} value={currentExport.content} spellCheck={false} /><p className="help">此处与保存文件使用完全相同的内容。不含 API Key；请保留事实来源、风险报告和草稿标识。</p></details>
             </div>}
           </section>
         </div>

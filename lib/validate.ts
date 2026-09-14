@@ -20,6 +20,7 @@ const CLAIMS: Array<{ label: string; match: RegExp; evidence: RegExp; key: FactK
   { label: "吸水性能", match: /\b(?:super[ -]?absorbent|highly absorbent|quick[ -]dry(?:ing)?|lint[ -]free)\b/i, evidence: /super[ -]?absorbent|highly absorbent|quick[ -]dry|lint[ -]free|强吸水|速干|不掉毛/i, key: "features" },
   { label: "耐用与使用寿命", match: /\b(?:durable|durability|long[ -]lasting|built to last)\b/i, evidence: /\b(?:durable|durability|long[ -]lasting|built to last)\b|耐用|使用寿命/i, key: "features" },
   { label: "可靠性能", match: /\b(?:reliable performance|reliably performs?|consistent performance)\b/i, evidence: /\b(?:reliable performance|reliably performs?|consistent performance)\b|可靠性能|性能可靠/i, key: "features" },
+  { label: "取物速度", match: /\b(?:quick(?:er)?\s+(?:access|retrieval)|retriev\w*\s+quickly|instant\s+access)\b/i, evidence: /\b(?:quick(?:er)?\s+(?:access|retrieval)|retriev\w*\s+quickly|instant\s+access)\b|快速取物|快速取用/i, key: "features" },
   { label: "泛化清洁用途", match: /\b(?:household|general(?:[ -]purpose)?|multi[ -]?purpose|all[ -]?purpose)\s+cleaning\b/i, evidence: /\b(?:household|general(?:[ -]purpose)?|multi[ -]?purpose|all[ -]?purpose)\s+cleaning\b|家居清洁|家务清洁|通用清洁|多用途清洁/i, key: "useCases" },
 ];
 
@@ -99,11 +100,14 @@ export function validateListing(profile: ProductProfile, listing: Listing): Risk
     const materialClaim = field === "title" || field === "itemHighlights" || /\b(?:made|crafted|built|material|construction|cotton|polyester|bamboo|silicone|nylon|polypropylene)\b/i.test(normalizedText);
     if (materialClaim) for (const material of MATERIALS) if (material.match.test(normalizedText) && (!part.factIds.includes("material") || !positiveEvidence(allowed.get("material")?.value ?? "", material.evidence))) issue(`material.${material.name}`, "无依据材质", `材质字段未确认 ${material.name}，或该段未引用材质事实。`, material.name);
     for (const rule of CLAIMS) if (rule.match.test(normalizedText) && (!part.factIds.includes(rule.key) || !positiveEvidence(allowed.get(rule.key)?.value ?? "", rule.evidence))) issue(`claim.${rule.key}.${rule.label}`, "无依据功能声明", `${rule.label}缺少对应的已确认肯定事实，否定或未知描述不构成支持。`, normalizedText.match(rule.match)?.[0]);
+    // Structural access alone cannot establish an undisturbed retrieval outcome.
+    const undisturbed = /\bwithout\s+(?:disrupting|disturbing|moving)\s+(?:(?:the|any)\s+)?(?:surrounding|nearby|other)\s+(?:objects|items)\b/i;
+    if (undisturbed.test(normalizedText)) issue("undisturbedAccess", "未经验证的取物效果", "本版不把抽拉结构当作不影响周围物品的保证；删除该效果承诺，保留已确认结构和功能。", normalizedText.match(undisturbed)?.[0]);
     const prohibited = /\b(?:best|perfect|no\.?\s*1|number\s*one|guaranteed|money[ -]back|fda|ce certified|certified|antibacterial|anti[ -]bacterial|cure|cures|treats|medical[ -]grade|non[ -]toxic|bpa[ -]free|food[ -]safe|eco[ -]friendly)\b|100\s*%\s*(?:safe|effective|guarantee)/i;
     if (prohibited.test(normalizedText)) issue("restricted", "高风险宣传用语", "本版保守拦截排名、保证、医疗、环保与认证等声明，需专门核验后再使用。", normalizedText.match(prohibited)?.[0]);
     const brand = allowed.get("brand")?.value.normalize("NFKC").toLowerCase().trim();
     // A list of colors is not evidence that the buyer can select a variant.
-    const variantChoice = /\b(?:available|comes?|offered)\s+in\b[^.!?;\n]{0,140}\b(?:options|variations|variants)\b|\bcolou?r\s+(?:options|choices|variants)\b|\b(?:choose|select)\s+(?:from|between)\b/i;
+    const variantChoice = /\b(?:available|comes?|offered)\s+in\b[^.!?;\n]{0,140}\b(?:options|variations|variants)\b|\bcolou?r\s+(?:options|choices|variants)\b|\b(?:choose|select)\s+(?:from|between)\b|\b(?:available|offered)\s+(?:finishes|colou?rs|styles)\b|\b(?:collection|set|pack)\s+(?:includes?|contains?)\b[^.!?;\n]{0,140}\b(?:variations|variants|assortment)\b/i;
     if (part.factIds.includes("color") && variantChoice.test(normalizedText) && !positiveEvidence(allowed.get("color")?.value ?? "", /\b(?:options|choices|variants|variations|selectable)\b|可选|任选/i)) {
       add({ id: `${field}.colorVariants`, severity: "warn", label: "颜色不等于可选款式", detail: "已确认颜色未说明购买时可选款式。请删除 options / select 等选择承诺，或核对实际 SKU 选项并补充来源。", field, factIds: ["color"], excerpt: normalizedText.match(variantChoice)?.[0] });
     }

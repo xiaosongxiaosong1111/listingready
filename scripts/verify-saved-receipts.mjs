@@ -12,7 +12,8 @@ if (accessToken) {
 }
 const file = process.argv[2];
 if (!file) throw new Error("Provide a saved live-stability JSON receipt file.");
-const receipts = JSON.parse(await readFile(file, "utf8"));
+const saved = JSON.parse(await readFile(file, "utf8"));
+const receipts = Array.isArray(saved) ? saved : [saved];
 const outcomes = [];
 for (const receipt of receipts) {
   if (receipt.status !== 200 || !receipt.result) continue;
