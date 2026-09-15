@@ -27,12 +27,20 @@ ListingReady 是面向中小跨境卖家的可信 AI 上新工作台。输入有
 - 历史提示词 v3 的连续 10 次结构化文本请求为 10/10 成功，共 13 次物理调用，不能解释为事实准确率 100%，也不是新提示词 v4 的连续测试。
 - 当前文本提示词：facts-only.v6.2026-09-14；风险规则：amazon-us-non-media-2026-09-14.v6；图片提示词：reference-preserving.v3.2026-09-09。
 - 自动化测试通过不等于全部用户流程已验收。复制的实际粘贴、下载文件落盘、新图片复核门槛的浏览器事件仍待补验。
-- [线上体验](https://listingready-demo.coral-rose-4718.chatgpt.site/) 仍为本人私有，未向评委开放；浏览器需登录。线上版本和源码对应关系见最新发布记录，原 GitHub 推送目前受连接权限阻挡。
+- [线上体验](https://listingready-demo.coral-rose-4718.chatgpt.site/) 仍为本人私有，浏览器需登录；公开源码位于 [GitHub 仓库](https://github.com/xiaosongxiaosong1111/listingready)。线上版本和源码对应关系见最新发布记录。
 - 当前无数据库；刷新会丢失未保存的会话，图片链接可能过期。模型元数据和人工复核声明未经服务端签名。
 
 ## 运行
 
-推荐 Node.js 24。保留现有 Vinext / React / Cloudflare 架构和 package-lock.json。
+需要 Node.js 22.13.0 或更高版本。保留现有 Vinext / React / Cloudflare 架构和 package-lock.json。
+
+### Windows 一键启动真实模式
+
+首次使用时，将 `.env.example` 复制为 `.env.local`，只在本机填入比赛 Token Plan Key。随后双击根目录的 `start-live.cmd`。脚本会安装依赖、以 Node.js 22.13.1 启动服务，并自动打开 `http://localhost:3000/`。
+
+此模式只调用真实比赛接口：没有 Key 会停止启动，模型请求失败会在页面显示错误，不会回退到固定文案、离线夹具或模拟图片。`.env.local` 已被 Git 忽略，不应上传到公开仓库。
+
+也可以手动启动：
 
 ```bash
 npm install
